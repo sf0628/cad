@@ -1,5 +1,7 @@
+"use client";
+
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sparkles, Zap, Box, Wrench, Layers } from 'lucide-react';
 import { CyberInput } from './CyberInput';
@@ -31,7 +33,7 @@ const complexityLevels = [
 ];
 
 export const HeroSection = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [prompt, setPrompt] = useState('');
   const [productType, setProductType] = useState('enclosure');
   const [useCase, setUseCase] = useState('prototype');
@@ -54,12 +56,13 @@ export const HeroSection = () => {
       complexity,
     };
     
-    // Navigate to generate page with state
-    navigate('/generate', { state: formData });
+    // Store in sessionStorage and navigate with URL params
+    sessionStorage.setItem('generateFormData', JSON.stringify(formData));
+    router.push(`/generate?prompt=${encodeURIComponent(formData.prompt)}&productType=${encodeURIComponent(formData.productType)}&useCase=${encodeURIComponent(formData.useCase)}&complexity=${encodeURIComponent(formData.complexity)}`);
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center px-4 py-12 overflow-hidden">
+    <div className="relative min-h-screen flex flex-col items-center justify-center px-4 py-12 overflow-visible">
       {/* Background effects */}
       <div className="absolute inset-0 cyber-grid opacity-30" />
       <div className="absolute inset-0 scanlines opacity-20" />
@@ -81,35 +84,28 @@ export const HeroSection = () => {
 
       {/* Main content */}
       <div className="relative z-10 w-full max-w-4xl mx-auto">
-        {/* Hero text */}
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 30 }}
+        {/* Subtle title */}
+        <motion.h2
+          className="text-center mb-8 font-mono text-lg md:text-xl font-normal"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          {/* <span className="text-foreground/70">3D Print Your </span> */}
+          <span className="text-gradient-cyber">3D Print Your Ideas</span>
+        </motion.h2>
+
+        {/* Feature badges - now the visual focal point */}
+        <motion.div 
+          className="flex flex-wrap justify-center gap-4 mb-16"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-        >
-          <h1 className="font-mono text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-foreground">Transform Ideas Into</span>
-            <br />
-            <span className="text-gradient-cyber neon-glow">Tangible Designs</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            AI-powered parametric design generator. Describe your engineering vision
-            and get downloadable STL files, documentation, and 3D previews.
-          </p>
-        </motion.div>
-
-        {/* Feature badges */}
-        <motion.div 
-          className="flex flex-wrap justify-center gap-4 mb-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
         >
           {[
             { icon: Box, label: 'STL Export' },
             { icon: Layers, label: '3D Preview' },
-            { icon: Wrench, label: 'Parametric' },
+            // { icon: Wrench, label: 'Parametric' },
             { icon: Zap, label: 'AI-Powered' },
           ].map((feature, i) => (
             <div

@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { Copy, Check } from 'lucide-react';

@@ -1,3 +1,5 @@
+"use client";
+
 import { Download, FileText, Box, Image } from 'lucide-react';
 import { CyberButton } from './CyberButton';
 import { motion } from 'framer-motion';

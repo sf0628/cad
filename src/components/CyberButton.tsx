@@ -1,3 +1,5 @@
+"use client";
+
 import { forwardRef, ButtonHTMLAttributes } from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';

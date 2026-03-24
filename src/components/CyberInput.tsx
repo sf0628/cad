@@ -27,7 +27,7 @@ export const CyberInput = forwardRef<HTMLInputElement, CyberInputProps>(
             ref={ref}
             className={cn(
               "w-full px-6 py-4 bg-card/50 border border-border rounded-lg",
-              "text-foreground placeholder:text-muted-foreground",
+              "text-foreground placeholder:text-muted-foreground placeholder:text-sm",
               "font-mono text-lg",
               "focus:outline-none focus:border-primary",
               "transition-all duration-300",

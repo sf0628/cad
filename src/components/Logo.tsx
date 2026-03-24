@@ -12,12 +12,12 @@ export const Logo = () => {
     >
       {/* Code bracket logo */}
       <div className="relative">
-        <span className="font-mono font-bold text-2xl tracking-wider text-gradient-cyber neon-glow">
+        <span className="font-mono font-bold invisible sm:visible text-md tracking-wider text-gradient-cyber neon-glow">
           &lt;/&gt;
         </span>
         {/* Glow effect */}
         <div className="absolute inset-0 blur-md opacity-50 -z-10">
-          <span className="font-mono font-bold text-2xl tracking-wider text-gradient-cyber">
+          <span className="font-mono font-bold invisible sm:visible text-md tracking-wider text-gradient-cyber">
             &lt;/&gt;
           </span>
         </div>

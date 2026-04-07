@@ -1,24 +1,24 @@
-import { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, RefreshCw } from 'lucide-react';
-import * as THREE from 'three';
-import { toast } from 'sonner';
+import { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowLeft, RefreshCw } from "lucide-react";
+import * as THREE from "three";
+import { toast } from "sonner";
 
-import { Logo } from '@/components/Logo';
-import { CyberButton } from '@/components/CyberButton';
-import { ModelViewer } from '@/components/ModelViewer';
-import { DocumentationPanel } from '@/components/DocumentationPanel';
-import { LoadingState } from '@/components/LoadingState';
-import { DownloadPanel } from '@/components/DownloadPanel';
-import { ParticleField } from '@/components/ParticleField';
-import { 
-  generateGeometry, 
-  createSTLBlob, 
+import { Logo } from "@/components/Logo";
+import { CyberButton } from "@/components/CyberButton";
+import { ModelViewer } from "@/components/ModelViewer";
+import { DocumentationPanel } from "@/components/DocumentationPanel";
+import { LoadingState } from "@/components/LoadingState";
+import { DownloadPanel } from "@/components/DownloadPanel";
+import { ParticleField } from "@/components/ParticleField";
+import {
+  generateGeometry,
+  createSTLBlob,
   TemplateType,
-  GenerationParams 
-} from '@/lib/stlGenerator';
-import { supabase } from '@/integrations/supabase/client';
+  GenerationParams,
+} from "@/lib/stlGenerator";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FormData {
   prompt: string;
@@ -33,17 +33,18 @@ const Generate = () => {
   const formData = location.state as FormData | null;
 
   const [isGenerating, setIsGenerating] = useState(true);
-  const [status, setStatus] = useState('Analyzing requirements...');
+  const [status, setStatus] = useState("Analyzing requirements...");
   const [progress, setProgress] = useState(0);
   const [geometry, setGeometry] = useState<THREE.BufferGeometry | null>(null);
   const [stlBlob, setStlBlob] = useState<Blob | null>(null);
-  const [markdown, setMarkdown] = useState('');
-  const [generationParams, setGenerationParams] = useState<GenerationParams | null>(null);
+  const [markdown, setMarkdown] = useState("");
+  const [generationParams, setGenerationParams] =
+    useState<GenerationParams | null>(null);
 
   // Redirect if no form data
   useEffect(() => {
     if (!formData) {
-      navigate('/');
+      navigate("/");
     }
   }, [formData, navigate]);
 
@@ -55,73 +56,76 @@ const Generate = () => {
       try {
         setIsGenerating(true);
         setProgress(0);
-        
+
         // Step 1: Analyze with AI
-        setStatus('Analyzing requirements...');
+        setStatus("Analyzing requirements...");
         setProgress(10);
-        
+
         // Call AI edge function for template selection and parameters
-        const { data: aiResult, error: aiError } = await supabase.functions.invoke('generate-design', {
-          body: {
-            prompt: formData.prompt,
-            productType: formData.productType,
-            useCase: formData.useCase,
-            complexity: formData.complexity,
-          },
-        });
+        const { data: aiResult, error: aiError } =
+          await supabase.functions.invoke("generate-design", {
+            body: {
+              prompt: formData.prompt,
+              productType: formData.productType,
+              useCase: formData.useCase,
+              complexity: formData.complexity,
+            },
+          });
 
         if (aiError) {
-          console.error('AI error:', aiError);
+          console.error("AI error:", aiError);
           // Fallback to local generation
-          toast.warning('Using local generation (AI unavailable)');
+          toast.warning("Using local generation (AI unavailable)");
         }
 
-        setStatus('Selecting template...');
+        setStatus("Selecting template...");
         setProgress(30);
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 500));
 
         // Parse AI result or use defaults
-        const template: TemplateType = aiResult?.template || formData.productType as TemplateType;
+        const template: TemplateType =
+          aiResult?.template || (formData.productType as TemplateType);
         const params: GenerationParams = {
           template,
           ...(aiResult?.params || {}),
         };
 
         setGenerationParams(params);
-        
-        setStatus('Generating geometry...');
+
+        setStatus("Generating geometry...");
         setProgress(50);
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 500));
 
         // Generate 3D geometry
         const generatedGeometry = generateGeometry(params);
         setGeometry(generatedGeometry);
-        
+
         // Create STL blob
         const blob = createSTLBlob(generatedGeometry);
         setStlBlob(blob);
-        
-        setStatus('Creating documentation...');
+
+        setStatus("Creating documentation...");
         setProgress(70);
 
         // Get or generate documentation
-        const doc = aiResult?.documentation || generateFallbackDocumentation(formData, params);
+        const doc =
+          aiResult?.documentation ||
+          generateFallbackDocumentation(formData, params);
         setMarkdown(doc);
 
-        setStatus('Rendering preview...');
+        setStatus("Rendering preview...");
         setProgress(90);
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 500));
 
         setProgress(100);
-        setStatus('Complete!');
+        setStatus("Complete!");
         setIsGenerating(false);
-        
-        toast.success('Design generated successfully!');
-        
+
+        toast.success("Design generated successfully!");
       } catch (error) {
-        console.error('Generation error:', error);
-        toast.error('Generation failed. Using fallback.');
-        
+        console.error("Generation error:", error);
+        toast.error("Generation failed. Using fallback.");
+
         // Fallback generation
         const fallbackParams: GenerationParams = {
           template: formData.productType as TemplateType,
@@ -141,7 +145,7 @@ const Generate = () => {
     if (!formData) return;
     setGeometry(null);
     setStlBlob(null);
-    setMarkdown('');
+    setMarkdown("");
     setIsGenerating(true);
     setProgress(0);
     // Trigger re-generation by updating a key or state
@@ -150,15 +154,15 @@ const Generate = () => {
 
   const handleCaptureRender = () => {
     // Get the canvas element and export as PNG
-    const canvas = document.querySelector('canvas');
+    const canvas = document.querySelector("canvas");
     if (canvas) {
-      const link = document.createElement('a');
-      link.download = 'forge-render.png';
-      link.href = canvas.toDataURL('image/png');
+      const link = document.createElement("a");
+      link.download = "forge-render.png";
+      link.href = canvas.toDataURL("image/png");
       link.click();
-      toast.success('Render saved!');
+      toast.success("Render saved!");
     } else {
-      toast.error('Could not capture render');
+      toast.error("Could not capture render");
     }
   };
 
@@ -177,14 +181,14 @@ const Generate = () => {
         <div className="flex items-center gap-6">
           <Logo />
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="font-mono text-sm">Back</span>
           </button>
         </div>
-        
+
         <CyberButton
           variant="outline"
           size="sm"
@@ -204,12 +208,20 @@ const Generate = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <p className="font-mono text-sm text-muted-foreground mb-1">Generating:</p>
+          <p className="font-mono text-sm text-muted-foreground mb-1">
+            Generating:
+          </p>
           <p className="text-lg text-foreground">{formData.prompt}</p>
           <div className="flex gap-4 mt-2">
-            <span className="text-xs font-mono text-primary">{formData.productType}</span>
-            <span className="text-xs font-mono text-accent">{formData.useCase}</span>
-            <span className="text-xs font-mono text-secondary">{formData.complexity}</span>
+            <span className="text-xs font-mono text-primary">
+              {formData.productType}
+            </span>
+            <span className="text-xs font-mono text-accent">
+              {formData.useCase}
+            </span>
+            <span className="text-xs font-mono text-secondary">
+              {formData.complexity}
+            </span>
           </div>
         </motion.div>
 
@@ -228,7 +240,10 @@ const Generate = () => {
 
               {/* Documentation */}
               <div className="h-[500px]">
-                <DocumentationPanel markdown={markdown} isLoading={isGenerating} />
+                <DocumentationPanel
+                  markdown={markdown}
+                  isLoading={isGenerating}
+                />
               </div>
             </div>
 
@@ -247,10 +262,13 @@ const Generate = () => {
 };
 
 // Fallback documentation generator
-function generateFallbackDocumentation(formData: FormData, params: GenerationParams): string {
-  const now = new Date().toISOString().split('T')[0];
-  
-  return `# ForgeAI Design Report
+function generateFallbackDocumentation(
+  formData: FormData,
+  params: GenerationParams
+): string {
+  const now = new Date().toISOString().split("T")[0];
+
+  return `# Text_to_CAD Design Report
 
 ## Design Overview
 
@@ -313,7 +331,7 @@ This design was generated based on your specifications for a ${formData.productT
 
 ---
 
-*Generated by ForgeAI - AI-Native Engineering Design Tool*
+*Generated by Text_to_CAD - AI-Native Engineering Design Tool*
 `;
 }
 

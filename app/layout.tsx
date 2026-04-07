@@ -16,8 +16,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ForgeAI - AI-Powered Design Generator",
-  description: "Transform ideas into tangible designs with AI-powered parametric design generator",
+  title: "Text_to_CAD - AI-Powered Design Generator",
+  description:
+    "Transform ideas into tangible designs with AI-powered parametric design generator",
 };
 
 export default function RootLayout({
@@ -27,7 +28,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+      <body
+        className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

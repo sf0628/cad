@@ -43,7 +43,7 @@ export const ParticleField = () => {
               : '0 0 6px hsl(320 100% 50%)',
           }}
           animate={{
-            y: [0, -window.innerHeight - 100],
+            y: [0, -1200],
             x: [0, Math.sin(particle.id) * 50],
             opacity: [0, 1, 1, 0],
           }}
